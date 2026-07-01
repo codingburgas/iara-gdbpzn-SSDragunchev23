@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # 1. КОНТЕНЕР ЗА БАЗАТА ДАННИ
+  db:
+    image: postgres:16-alpine
+    container_name: iara-postgres-db
+    environment:
+      POSTGRES_USER: iara_user
+      POSTGRES_PASSWORD: iara_pass
+      POSTGRES_DB: iara_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  # 2. КОНТЕНЕР ЗА НАШИЯ PYTHON БЕКЕНД
+  web:
+    build: .
+    container_name: iara-web-app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://iara_user:iara_pass@db:5432/iara_db
+    depends_on:
+      - db
+    restart: always
+
+volumes:
+  postgres_data:
